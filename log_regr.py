@@ -24,6 +24,8 @@ from pyspark.mllib.classification import LogisticRegressionWithSGD
 from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 
+# number of nodes - used for number of partitions
+nodes = 13
 
 # ###Read data in from airline
 
@@ -51,7 +53,7 @@ def air_parse(x):
 
     return([air_date, air_delay_15])
 
-train_air = sc.textFile('gs://donorbureaudata/inmar/airline/2007.csv')
+train_air = sc.textFile('gs://donorbureaudata/inmar/airline/2007.csv', (nodes * 4))
 
 # filter out header row
 # train_air = train_air.filter(lambda i: 'Year' not in i)
@@ -69,7 +71,7 @@ train_air.take(10)
 # ###Read data from weather
 
 sc.textFile('gs://donorbureaudata/full_data_rand/*', (nodes * 4))
-train_tempmax = sc.textFile('gs://donorbureaudata/inmar/weather/2007.csv')
+train_tempmax = sc.textFile('gs://donorbureaudata/inmar/weather/2007.csv', (nodes * 4))
 
 # filter on TMAX and USW00094846
 train_tempmax = train_tempmax.filter(lambda i: 'TMAX' in i)
@@ -79,7 +81,7 @@ train_tempmax = train_tempmax.map(lambda i: i.split(',')).map(lambda i: [i[1], i
 
 train_tempmax.collect()
 
-train_tempmin = sc.textFile('gs://donorbureaudata/inmar/weather/2007.csv')
+train_tempmin = sc.textFile('gs://donorbureaudata/inmar/weather/2007.csv', (nodes * 4))
 
 # filter on TMAX and USW00094846
 train_tempmin = train_tempmin.filter(lambda i: 'TMIN' in i)
@@ -121,7 +123,7 @@ model = LogisticRegressionWithSGD.train(train_model_data)
 
 # ###Airline data
 
-test_air = sc.textFile('gs://donorbureaudata/inmar/airline/2008.csv')
+test_air = sc.textFile('gs://donorbureaudata/inmar/airline/2008.csv', (nodes * 4))
 
 # filter out header row
 # filter on rows that have 2007 - removes header and extra rows
@@ -137,7 +139,7 @@ test_air.take(10)
 
 # ###Weather Data
 
-test_tempmax = sc.textFile('gs://donorbureaudata/inmar/weather/2008.csv')
+test_tempmax = sc.textFile('gs://donorbureaudata/inmar/weather/2008.csv', (nodes * 4))
 
 # filter on TMAX and USW00094846
 test_tempmax = test_tempmax.filter(lambda i: 'TMAX' in i)
@@ -145,7 +147,7 @@ test_tempmax = test_tempmax.filter(lambda i: 'USW00094846' in i)
 
 test_tempmax = test_tempmax.map(lambda i: i.split(',')).map(lambda i: [i[1], int(i[3])])
 
-test_tempmin = sc.textFile('gs://donorbureaudata/inmar/weather/2008.csv')
+test_tempmin = sc.textFile('gs://donorbureaudata/inmar/weather/2008.csv', (nodes * 4))
 
 # filter on TMAX and USW00094846
 test_tempmin = test_tempmin.filter(lambda i: 'TMIN' in i)
