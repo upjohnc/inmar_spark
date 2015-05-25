@@ -79,8 +79,6 @@ train_tempmax = train_tempmax.filter(lambda i: 'USW00094846' in i)
 
 train_tempmax = train_tempmax.map(lambda i: i.split(',')).map(lambda i: [i[1], int(i[3])])
 
-train_tempmax.collect()
-
 train_tempmin = sc.textFile('gs://donorbureaudata/inmar/weather/2007.csv', (nodes * 4))
 
 # filter on TMAX and USW00094846
